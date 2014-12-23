@@ -192,6 +192,7 @@ class CleanData(webapp2.RequestHandler):
         
         fs.put()
         
+        
         self.response.write('Data cleaned, ' + str(pointsRemoved) + ' points removed.')
         
 
