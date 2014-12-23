@@ -41,7 +41,7 @@
               <h3 class="masthead-brand">FridgeSitter</h3>
               <nav>
                 <ul class="nav masthead-nav">
-                  <li class="active"><a href="#">Home</a></li>
+                  <li class="active"><a href="/">Home</a></li>
                   <li><a href="#">About</a></li>
                   <li><a href="#">Contact</a></li>
 				  {% if user %}
@@ -78,9 +78,9 @@
 						<tbody>
 							{% for fridgeSitter in fridgeSitters %}
 								<tr>
-									<td class="text-left"><a href={{fridgeSitter.getDashboardLink()}}>{{ fridgeSitter.name }}</a></td>
-									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.fridge) }}</td>
-									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.ambient) }}</td>
+									<td class="text-left"><h3><a href={{fridgeSitter.getDashboardLink()}}>{{ fridgeSitter.name }}</a></h3></td>
+									<td class="text-center"><h3><span {% if fridgeSitter.fridgeStatus %}class="label label-success"{% else %} class="label label-danger"{% endif %}>{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.fridge) }}</span></h3></td>
+									<td class="text-center"><h3><span {% if fridgeSitter.ambientStatus %}class="label label-success"{% else %} class="label label-danger"{% endif %}>{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.ambient) }}</span></h3></td>
 								</tr>
 							{% endfor %}
 						</tbody>
@@ -89,7 +89,7 @@
 			  {% else %}
 			  <p class="lead">You don't have any devices!</p>
 			  {% endif %}
-			  <p><a class="btn btn-lg btn-success" href="#" role="button">Click here to add a new device</a></p>
+			  <p><a class="btn btn-lg btn-success" href="/addDevice" role="button">Click here to add a new device</a></p>
 			{% else %}
 			  <p class="lead">FridgeSitter provides the peace of mind that the food in your fridge, freezer, or grocery bag is free of food borne illness caused by storage or transport above safe temperatures.</p>
               <p class="lead">

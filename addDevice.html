@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../favicon.ico">
 
-    <title>Welcome to Fridge Sitter</title>
+    <title>Add a New Fridge Sitter</title>
 
     <!-- Bootstrap core CSS -->
     <link href="./css/bootstrap.min.css" rel="stylesheet">
@@ -41,7 +41,7 @@
               <h3 class="masthead-brand">FridgeSitter</h3>
               <nav>
                 <ul class="nav masthead-nav">
-                  <li class="active"><a href="#">Home</a></li>
+                  <li class="active"><a href="/">Home</a></li>
                   <li><a href="#">About</a></li>
                   <li><a href="#">Contact</a></li>
 				  {% if user %}
@@ -56,47 +56,37 @@
           </div>
 
           <div class="inner cover">
-            <h1 class="cover-heading">
-			  {% if user %}
-			    Welcome {{user.nickname().split('@')[0]}}!
-			  {% else %}
-			    Welcome to the home of FridgeSitter!
-			  {% endif %}
-			</h1>
-			{% if user %}
-			  {% if fridgeSitters|length > 0 %}
-				<p class="lead">Click on the name of a device below to view additional details</p>
-				<div class="table-responsive">
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="col-sm-1">Device Name</th>
-								<th class="col-sm-1">Fridge Average (F)</th>
-								<th class="col-sm-1">Ambient Average (F)</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for fridgeSitter in fridgeSitters %}
-								<tr>
-									<td class="text-left"><a href={{fridgeSitter.getDashboardLink()}}>{{ fridgeSitter.name }}</a></td>
-									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.fridge) }}</td>
-									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.ambient) }}</td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			  {% else %}
-			  <p class="lead">You don't have any devices!</p>
-			  {% endif %}
-			  <p><a class="btn btn-lg btn-success" href="#" role="button">Click here to add a new device</a></p>
+			{% if get %}
+				<form action="/addDevice" method="post">
+					<p class="lead">Give your device a name:</p>
+					<div><textarea class="text-primary" name="name" rows="1" cols="40" placeholder="Wine Cellar"></textarea></div>
+					<p class="lead">Set limits on the safe temperature range for your refrigerator:</p>
+					<div>
+						<textarea class="text-primary" name="fridgeMin" rows="1" cols="20" placeholder="I'm chilly!"></textarea>
+						<textarea class="text-primary" name="fridgeMax" rows="1" cols="20" placeholder="It's like a sauna in here!"></textarea>
+					</div>
+					<p class="lead">Set limits on the acceptable ambient temperature range:</p>
+					<div>
+						<textarea class="text-primary" name="ambientMin" rows="1" cols="20" placeholder="Where's my snuggie!"></textarea>
+						<textarea class="text-primary" name="ambientMax" rows="1" cols="20" placeholder="Pool party?"></textarea>
+					</div>
+					<p class="lead">How often should your fridge check in with us?</p>
+					<div>
+						<textarea class="text-primary" name="checkInInt" rows="1" cols="20" placeholder="12 minutes"></textarea>
+					</div>
+					<p class="lead">Temperature Probe Configuration:</p>
+					<div>
+						<textarea class="text-primary" name="tempSets" rows="1" cols="20">01</textarea>
+					</div>
+					<div><p></p><input class="btn btn-lg btn-success" type="submit" value="Add New Device"></div>
+				</form>
 			{% else %}
-			  <p class="lead">FridgeSitter provides the peace of mind that the food in your fridge, freezer, or grocery bag is free of food borne illness caused by storage or transport above safe temperatures.</p>
-              <p class="lead">
-                Learn more here or <a href={{ loginURL }}>login with your Google account</a> to get started now!
-              </p>
+				<h1 class="cover-heading">
+					Success!
+				</h1>
+				<p class="lead">Congratulations on adding a new FridgeSitter device. Its ID string is:</p>
+				<p class="text-primary">{{ activeFridgeSitter.key.urlsafe() }}</p>
 			{% endif %}
-            
           </div>
 
           <div class="mastfoot">

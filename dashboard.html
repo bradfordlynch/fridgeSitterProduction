@@ -35,20 +35,32 @@
     function drawChart() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('number', 'Time');
-      data.addColumn('number', 'Fridge Temperature');
-
-      data.addRows({{activeFridgeSitter.dataForPlot()}});
+      data.addColumn('datetime', 'Time');
+      data.addColumn('number', 'Fridge');
+	  data.addRows({{activeFridgeSitter.dataForPlot()}});
 
       var options = {
-        width: 1000,
-        height: 563,
+		curveType: 'function',
+        width: 600,
+        height: 330,
+		lineWidth: 4,
+		title: 'Recent Temperature Data from {{activeFridgeSitter.name}}',
+		titleTextStyle: {color: 'white'},
         hAxis: {
-          title: 'Time'
+          title: 'Time',
+		  titleTextStyle: {color:'white'},
+		  textStyle: {color:'white'}
         },
         vAxis: {
-          title: 'Temperature (Deg F)'
-        }
+          title: 'Temperature (Deg F)',
+		  titleTextStyle: {color:'white'},
+		  textStyle: {color:'white'}
+        },
+		backgroundColor: '#333',
+		chartArea:{backgroundColor: 'white'},
+		legend: {
+			textStyle:{color:'white'}
+		}
       };
 
       var chart = new google.visualization.LineChart(
@@ -60,20 +72,32 @@
 	
 	google.setOnLoadCallback(drawGauge);
 
-  var gaugeOptions = {min: 0, max: 280, yellowFrom: 200, yellowTo: 250,
-    redFrom: 250, redTo: 280, minorTicks: 5};
-  var gauge;
+  var fridgeGaugeOptions = {min: 0.9*{{activeFridgeSitter.fridgeMin|float}}, max: {{activeFridgeSitter.fridgeMax|float}} + 0.1*{{activeFridgeSitter.fridgeMin|float}}, yellowFrom: 0.9*{{activeFridgeSitter.fridgeMin|float}}, yellowTo: {{activeFridgeSitter.fridgeMin|float}}, redFrom: {{activeFridgeSitter.fridgeMax|float}}, redTo: {{activeFridgeSitter.fridgeMax|float}} + 0.1*{{activeFridgeSitter.fridgeMin|float}}, minorTicks: 5};
+  var fridgeGauge;
+  
+  var ambientGaugeOptions = {min: 0.9*{{activeFridgeSitter.ambientMin|float}}, max: {{activeFridgeSitter.ambientMax|float}} + 0.1*{{activeFridgeSitter.ambientMin|float}}, yellowFrom: 0.9*{{activeFridgeSitter.ambientMin|float}}, yellowTo: {{activeFridgeSitter.ambientMin|float}}, redFrom: {{activeFridgeSitter.ambientMax|float}}, redTo: {{activeFridgeSitter.ambientMax|float}} + 0.1*{{activeFridgeSitter.ambientMin|float}}, minorTicks: 5};
+  var ambientGauge;
 
   function drawGauge() {
-    gaugeData = new google.visualization.DataTable();
-    gaugeData.addColumn('number', 'Fridge');
-    gaugeData.addColumn('number', 'Ambient');
-    gaugeData.addRows(2);
-    gaugeData.setCell(0, 0, {{'%0.1f' % activeFridgeSitter.getAverage(activeFridgeSitter.fridge)}});
-    gaugeData.setCell(0, 1, {{'%0.1f' % activeFridgeSitter.getAverage(activeFridgeSitter.ambient)}});
+    fridgeGaugeData = new google.visualization.DataTable();
+    fridgeGaugeData.addColumn('number', 'Deg F');
 
-    gauge = new google.visualization.Gauge(document.getElementById('gauge_div'));
-    gauge.draw(gaugeData, gaugeOptions);
+    fridgeGaugeData.addRows(1);
+    fridgeGaugeData.setCell(0, 0, {{'%0.1f' % activeFridgeSitter.fridgeAvg}});
+
+
+    fridgeGauge = new google.visualization.Gauge(document.getElementById('fridge_gauge_div'));
+    fridgeGauge.draw(fridgeGaugeData, fridgeGaugeOptions);
+	
+	ambientGaugeData = new google.visualization.DataTable();
+    ambientGaugeData.addColumn('number', 'Deg F');
+
+    ambientGaugeData.addRows(1);
+    ambientGaugeData.setCell(0, 0, {{'%0.1f' % activeFridgeSitter.ambientAvg}});
+
+
+    ambientGauge = new google.visualization.Gauge(document.getElementById('ambient_gauge_div'));
+    ambientGauge.draw(ambientGaugeData, ambientGaugeOptions);
   }
   </script>
   </head>
@@ -103,8 +127,21 @@
 				<h1 class="cover-heading">
 				Overview of {{ activeFridgeSitter.name }}
 				</h1>
-				<div id="gauge_div" style="width:280px; height: 140px;"></div>
-				<div id="activeFridgeSitterPlot"></div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div id="fridge_gauge_div" style="width: 60%; margin: 0 auto;"></div>
+						<h2><span {% if activeFridgeSitter.fridgeStatus %}class="label label-success"{% else %} class="label label-danger"{% endif %}>Fridge</span></h2>
+					</div>
+					<div class="col-xs-6">
+						<div id="ambient_gauge_div" style="width: 60%; margin: 0 auto;"></div>
+						<h2><span {% if activeFridgeSitter.ambientStatus %}class="label label-success"{% else %} class="label label-danger"{% endif %}>Ambient</span></h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div id="activeFridgeSitterPlot" style="width: 90%; margin: 0 auto;"></div>
+					</div>
+				</div>
 				
 			</div>
 
