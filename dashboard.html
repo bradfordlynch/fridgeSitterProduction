@@ -69,8 +69,8 @@
     gaugeData.addColumn('number', 'Fridge');
     gaugeData.addColumn('number', 'Ambient');
     gaugeData.addRows(2);
-    gaugeData.setCell(0, 0, {{activeFridgeSitter.getAverage(activeFridgeSitter.fridge)}});
-    gaugeData.setCell(0, 1, {{activeFridgeSitter.getAverage(activeFridgeSitter.ambient)}});
+    gaugeData.setCell(0, 0, {{'%0.1f' % activeFridgeSitter.getAverage(activeFridgeSitter.fridge)}});
+    gaugeData.setCell(0, 1, {{'%0.1f' % activeFridgeSitter.getAverage(activeFridgeSitter.ambient)}});
 
     gauge = new google.visualization.Gauge(document.getElementById('gauge_div'));
     gauge.draw(gaugeData, gaugeOptions);

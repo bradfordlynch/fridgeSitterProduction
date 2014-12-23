@@ -42,7 +42,7 @@
               <nav>
                 <ul class="nav masthead-nav">
                   <li class="active"><a href="#">Home</a></li>
-                  <li><a href="#">Features</a></li>
+                  <li><a href="#">About</a></li>
                   <li><a href="#">Contact</a></li>
 				  {% if user %}
 					<li><a href={{ logoutURL }}>Logout</a></li>
@@ -78,9 +78,9 @@
 						<tbody>
 							{% for fridgeSitter in fridgeSitters %}
 								<tr>
-									<td class="text-left">{{ fridgeSitter.name }}</td>
-									<td class="text-left">{{ fridgeSitter.fridgeAvg }}</td>
-									<td class="text-left">{{ fridgeSitter.ambientAvg }}</td>
+									<td class="text-left"><a href={{fridgeSitter.getDashboardLink()}}>{{ fridgeSitter.name }}</a></td>
+									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.fridge) }}</td>
+									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.ambient) }}</td>
 								</tr>
 							{% endfor %}
 						</tbody>

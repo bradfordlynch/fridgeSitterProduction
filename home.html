@@ -79,8 +79,8 @@
 							{% for fridgeSitter in fridgeSitters %}
 								<tr>
 									<td class="text-left"><a href={{fridgeSitter.getDashboardLink()}}>{{ fridgeSitter.name }}</a></td>
-									<td class="text-left">{{ fridgeSitter.getAverage(fridgeSitter.fridge) }}</td>
-									<td class="text-left">{{ fridgeSitter.getAverage(fridgeSitter.ambient) }}</td>
+									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.fridge) }}</td>
+									<td class="text-left">{{ '%0.1f' % fridgeSitter.getAverage(fridgeSitter.ambient) }}</td>
 								</tr>
 							{% endfor %}
 						</tbody>

@@ -79,6 +79,24 @@ class FridgeSitter(ndb.Model):
         
     def getDashboardLink(self):
         return '/dashboard/' + self.key.urlsafe()
+        
+    def cleanData(self):
+        i = 0
+        pointsRemoved = 0
+        
+        while i < len(self.fridge.x):
+            if self.fridge.x[i] == 0:
+                self.fridge.x.pop(i)
+                self.fridge.y.pop(i)
+                self.ambient.x.pop(i)
+                self.ambient.y.pop(i)
+                
+                pointsRemoved += 1
+            else:
+                i += 1
+                
+        return pointsRemoved
+                
     
 class FSOwner(ndb.Model):
     '''Models the owner of one or more fridge sitter devices'''
@@ -165,61 +183,17 @@ class SaveDataPoint(webapp2.RequestHandler):
         self.response.write('Data point saved')
         self.response.write('>0  >0 >0>3>7')
         
-#class PlotData(webapp2.RequestHandler):
-#    def get(self, fsID, stream, numDataPoints):
-#        key = ndb.Key(urlsafe=fsID)
-#        fs = key.get()
-#        
-#        stream = int(stream)
-#        
-#        if stream == 0:
-#            x = fs.fridge.x[-int(numDataPoints):]
-#            y = fs.fridge.y[-int(numDataPoints):]
-#        elif stream == 1:
-#            x = fs.ambient.x[-int(numDataPoints):]
-#            y = fs.ambient.y[-int(numDataPoints):]
-#        else:
-#            self.response.write('Unknown stream index')
-#        
-#        plt.figure()
-#        plt.plot(x, y,"r-")
-#        sio = cStringIO.StringIO()
-#        plt.savefig(sio, format="png")
-#        self.response.headers['Content-Type'] = 'image/png'
-#
-#        self.response.out.write(sio.getvalue())
-        
-class GaugeHandler(webapp2.RequestHandler):
-    
+class CleanData(webapp2.RequestHandler):
     def get(self, fsID):
         key = ndb.Key(urlsafe=fsID)
-        fridgeSitter = key.get()
+        fs = key.get()
         
-        avgFridgeTemp = fridgeSitter.getAverage(fridgeSitter.fridge)
-        avgAmbientTemp = fridgeSitter.getAverage(fridgeSitter.ambient)
+        pointsRemoved = fs.cleanData()
         
-        template_values = {
-            'avgFridgeTemp' : avgFridgeTemp,
-            'avgAmbientTemp' : avgAmbientTemp
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('gauge.html')
-        self.response.write(template.render(template_values))
+        fs.put()
         
-class JSPlotHandler(webapp2.RequestHandler):
-    
-    def get(self, fsID):
-        key = ndb.Key(urlsafe=fsID)
-        fridgeSitter = key.get()
+        self.response.write('Data cleaned, ' + str(pointsRemoved) + ' points removed.')
         
-        template_values = {
-            'fridgeSitter': fridgeSitter
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('plot.html')
-        self.response.write(template.render(template_values))
-        
-        self.response.write('Average Temp = ' + str(fridgeSitter.getAverage(fridgeSitter.fridge)) + ' deg F')
 
         
 app = webapp2.WSGIApplication([
@@ -228,7 +202,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/newFS', handler=AddFridgeSitter, name='addFridgeSitter'),
     webapp2.Route(r'/getFS/<fsID>', handler=GetFridgeSitter, name='GetFridgeSitter'),
     webapp2.Route(r'/saveDataPoint/<fsID>/<time>/<fridgeTemp>/<ambientTemp>', handler=SaveDataPoint, name='dataPoint'),
-    #webapp2.Route(r'/plotData/<fsID>/<stream>/<numDataPoints>', handler=PlotData, name='PlotData'),
-    webapp2.Route(r'/gauge/<fsID>', handler=GaugeHandler, name='gauge'),
-    webapp2.Route(r'/jsPlot/<fsID>', handler=JSPlotHandler, name='jsPlot')
+    webapp2.Route(r'/cleanData/<fsID>', handler=CleanData, name='cleanData')
 ])
